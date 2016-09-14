@@ -77,6 +77,8 @@
 #define UBX_WARN(...)		{GPS_WARN(__VA_ARGS__);}
 #define UBX_DEBUG(...)		{/*GPS_WARN(__VA_ARGS__);*/}
 
+extern GPSDriverUBX *ubx_instance;
+
 GPSDriverUBX::GPSDriverUBX(GPSCallbackPtr callback, void *callback_user, struct vehicle_gps_position_s *gps_position,
 			   struct satellite_info_s *satellite_info) :
 	GPSHelper(callback, callback_user),
@@ -376,50 +378,77 @@ GPSDriverUBX::waitForAck(const uint16_t msg, const unsigned timeout, const bool 
 	return ret;
 }
 
+int GPSDriverUBX::inner_receive_task_trampoline(unsigned timeout)
+{
+  return ubx_instance->inner_receive_task(timeout);
+}
+
+int GPSDriverUBX::inner_receive_task(unsigned timeout)
+{
+  bool ready_to_return = _configured ? (_got_posllh && _got_velned) : handled;
+
+  /* Wait for only UBX_PACKET_TIMEOUT if something already received. */
+  int ret = read(buf, sizeof(buf), ready_to_return ? UBX_PACKET_TIMEOUT : timeout);
+
+  if (ret < 0) {
+    /* something went wrong when polling or reading */
+    UBX_WARN("ubx poll_or_read err");
+    return -1;
+
+  } else if (ret == 0) {
+    /* return success if ready */
+    if (ready_to_return) {
+      _got_posllh = false;
+      _got_velned = false;
+      return handled;
+    }
+
+  } else {
+    //UBX_DEBUG("read %d bytes", ret);
+
+    /* pass received bytes to the packet decoder */
+    for (int i = 0; i < ret; i++) {
+      handled |= parseChar(buf[i]);
+      //UBX_DEBUG("parsed %d: 0x%x", i, buf[i]);
+    }
+  }
+
+  /* abort after timeout if no useful packets received */
+  if (_time_started + timeout * 1000 < gps_absolute_time()) {
+    UBX_DEBUG("timed out, returning");
+    return -1;
+  }
+
+  return 3;
+}
+
 int	// -1 = error, 0 = no message handled, 1 = message handled, 2 = sat info message handled
 GPSDriverUBX::receive(unsigned timeout)
 {
-	uint8_t buf[GPS_READ_BUFFER_SIZE];
+	_time_started = gps_absolute_time();
+	handled = 0;
 
-	/* timeout additional to poll */
-	gps_abstime time_started = gps_absolute_time();
+	pthread_t inner_task_thread;
+	struct sched_param sparam;
+	pthread_attr_t attr;
+	pthread_addr_t result;
 
-	int handled = 0;
+	pthread_attr_init(&attr);
+	pthread_attr_setstacksize(&attr, 1000);
+
+	sparam.sched_priority = sched_get_priority_max(SCHED_FIFO);
+	pthread_attr_setschedparam(&attr, &sparam);
 
 	while (true) {
-		bool ready_to_return = _configured ? (_got_posllh && _got_velned) : handled;
 
-		/* Wait for only UBX_PACKET_TIMEOUT if something already received. */
-		int ret = read(buf, sizeof(buf), ready_to_return ? UBX_PACKET_TIMEOUT : timeout);
+	  pthread_create(&inner_task_thread, &attr, (pthread_startroutine_t) &ubx_instance->inner_receive_task_trampoline, (FAR void *)timeout);
+	  pthread_join(inner_task_thread, &result);
 
-		if (ret < 0) {
-			/* something went wrong when polling or reading */
-			UBX_WARN("ubx poll_or_read err");
-			return -1;
-
-		} else if (ret == 0) {
-			/* return success if ready */
-			if (ready_to_return) {
-				_got_posllh = false;
-				_got_velned = false;
-				return handled;
-			}
-
-		} else {
-			//UBX_DEBUG("read %d bytes", ret);
-
-			/* pass received bytes to the packet decoder */
-			for (int i = 0; i < ret; i++) {
-				handled |= parseChar(buf[i]);
-				//UBX_DEBUG("parsed %d: 0x%x", i, buf[i]);
-			}
-		}
-
-		/* abort after timeout if no useful packets received */
-		if (time_started + timeout * 1000 < gps_absolute_time()) {
-			UBX_DEBUG("timed out, returning");
-			return -1;
-		}
+	  if ((int)result == 3) {
+	    continue;
+	  } else {
+	    return (int)result;
+	  }
 	}
 }
 
@@ -1369,4 +1398,3 @@ GPSDriverUBX::fnv1_32_str(uint8_t *str, uint32_t hval)
 	/* return our new hash value */
 	return hval;
 }
-

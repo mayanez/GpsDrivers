@@ -72,12 +72,12 @@
 #define UBX_ID_NAV_TIMEUTC	0x21
 #define UBX_ID_NAV_SVINFO	0x30
 #define UBX_ID_NAV_SAT		0x35
-#define UBX_ID_NAV_SVIN  	0x3B
-#define UBX_ID_NAV_RELPOSNED  	0x3C
-#define UBX_ID_INF_DEBUG  	0x04
-#define UBX_ID_INF_ERROR  	0x00
-#define UBX_ID_INF_NOTICE  	0x02
-#define UBX_ID_INF_WARNING 	0x01
+#define UBX_ID_NAV_SVIN		0x3B
+#define UBX_ID_NAV_RELPOSNED	0x3C
+#define UBX_ID_INF_DEBUG	0x04
+#define UBX_ID_INF_ERROR	0x00
+#define UBX_ID_INF_NOTICE	0x02
+#define UBX_ID_INF_WARNING	0x01
 #define UBX_ID_ACK_NAK		0x00
 #define UBX_ID_ACK_ACK		0x01
 #define UBX_ID_CFG_PRT		0x00
@@ -168,7 +168,7 @@
 #define UBX_TX_CFG_SBAS_MODE		UBX_TX_CFG_SBAS_MODE_DISABLED	/**< SBAS enabled or disabled */
 
 /* TX CFG-TMODE3 message contents */
-#define UBX_TX_CFG_TMODE3_FLAGS     	1 	    	/**< start survey-in */
+#define UBX_TX_CFG_TMODE3_FLAGS			1			/**< start survey-in */
 #define UBX_TX_CFG_TMODE3_SVINMINDUR    (3*60)		/**< survey-in: minimum duration [s] (higher=higher precision) */
 #define UBX_TX_CFG_TMODE3_SVINACCLIMIT  (10000)	/**< survey-in: position accuracy limit 0.1[mm] */
 
@@ -208,8 +208,8 @@ typedef struct {
 	int32_t		lat;		/**< Latitude [1e-7 deg] */
 	int32_t		height;		/**< Height above ellipsoid [mm] */
 	int32_t		hMSL;		/**< Height above mean sea level [mm] */
-	uint32_t	hAcc;  		/**< Horizontal accuracy estimate [mm] */
-	uint32_t	vAcc;  		/**< Vertical accuracy estimate [mm] */
+	uint32_t	hAcc;		/**< Horizontal accuracy estimate [mm] */
+	uint32_t	vAcc;		/**< Vertical accuracy estimate [mm] */
 } ubx_payload_rx_nav_posllh_t;
 
 /* Rx NAV-DOP */
@@ -248,14 +248,14 @@ typedef struct {
 /* Rx NAV-PVT (ubx8) */
 typedef struct {
 	uint32_t	iTOW;		/**< GPS Time of Week [ms] */
-	uint16_t	year; 		/**< Year (UTC)*/
-	uint8_t		month; 		/**< Month, range 1..12 (UTC) */
-	uint8_t		day; 		/**< Day of month, range 1..31 (UTC) */
-	uint8_t		hour; 		/**< Hour of day, range 0..23 (UTC) */
-	uint8_t		min; 		/**< Minute of hour, range 0..59 (UTC) */
+	uint16_t	year;		/**< Year (UTC)*/
+	uint8_t		month;		/**< Month, range 1..12 (UTC) */
+	uint8_t		day;		/**< Day of month, range 1..31 (UTC) */
+	uint8_t		hour;		/**< Hour of day, range 0..23 (UTC) */
+	uint8_t		min;		/**< Minute of hour, range 0..59 (UTC) */
 	uint8_t		sec;		/**< Seconds of minute, range 0..60 (UTC) */
-	uint8_t		valid; 		/**< Validity flags (see UBX_RX_NAV_PVT_VALID_...) */
-	uint32_t	tAcc; 		/**< Time accuracy estimate (UTC) [ns] */
+	uint8_t		valid;		/**< Validity flags (see UBX_RX_NAV_PVT_VALID_...) */
+	uint32_t	tAcc;		/**< Time accuracy estimate (UTC) [ns] */
 	int32_t		nano;		/**< Fraction of second (UTC) [-1e9...1e9 ns] */
 	uint8_t		fixType;	/**< GNSSfix type: 0 = No fix, 1 = Dead Reckoning only, 2 = 2D fix, 3 = 3d-fix, 4 = GNSS + dead reckoning, 5 = time only fix */
 	uint8_t		flags;		/**< Fix Status Flags (see UBX_RX_NAV_PVT_FLAGS_...) */
@@ -265,8 +265,8 @@ typedef struct {
 	int32_t		lat;		/**< Latitude [1e-7 deg] */
 	int32_t		height;		/**< Height above ellipsoid [mm] */
 	int32_t		hMSL;		/**< Height above mean sea level [mm] */
-	uint32_t	hAcc;  		/**< Horizontal accuracy estimate [mm] */
-	uint32_t	vAcc;  		/**< Vertical accuracy estimate [mm] */
+	uint32_t	hAcc;		/**< Horizontal accuracy estimate [mm] */
+	uint32_t	vAcc;		/**< Vertical accuracy estimate [mm] */
 	int32_t		velN;		/**< NED north velocity [mm/s]*/
 	int32_t		velE;		/**< NED east velocity [mm/s]*/
 	int32_t		velD;		/**< NED down velocity [mm/s]*/
@@ -286,35 +286,35 @@ typedef struct {
 /* Rx NAV-TIMEUTC */
 typedef struct {
 	uint32_t	iTOW;		/**< GPS Time of Week [ms] */
-	uint32_t	tAcc; 		/**< Time accuracy estimate (UTC) [ns] */
+	uint32_t	tAcc;		/**< Time accuracy estimate (UTC) [ns] */
 	int32_t		nano;		/**< Fraction of second, range -1e9 .. 1e9 (UTC) [ns] */
-	uint16_t	year; 		/**< Year, range 1999..2099 (UTC) */
-	uint8_t		month; 		/**< Month, range 1..12 (UTC) */
-	uint8_t		day; 		/**< Day of month, range 1..31 (UTC) */
-	uint8_t		hour; 		/**< Hour of day, range 0..23 (UTC) */
-	uint8_t		min; 		/**< Minute of hour, range 0..59 (UTC) */
+	uint16_t	year;		/**< Year, range 1999..2099 (UTC) */
+	uint8_t		month;		/**< Month, range 1..12 (UTC) */
+	uint8_t		day;		/**< Day of month, range 1..31 (UTC) */
+	uint8_t		hour;		/**< Hour of day, range 0..23 (UTC) */
+	uint8_t		min;		/**< Minute of hour, range 0..59 (UTC) */
 	uint8_t		sec;		/**< Seconds of minute, range 0..60 (UTC) */
-	uint8_t		valid; 		/**< Validity Flags (see UBX_RX_NAV_TIMEUTC_VALID_...) */
+	uint8_t		valid;		/**< Validity Flags (see UBX_RX_NAV_TIMEUTC_VALID_...) */
 } ubx_payload_rx_nav_timeutc_t;
 
 /* Rx NAV-SVINFO Part 1 */
 typedef struct {
 	uint32_t	iTOW;		/**< GPS Time of Week [ms] */
-	uint8_t		numCh; 		/**< Number of channels */
+	uint8_t		numCh;		/**< Number of channels */
 	uint8_t		globalFlags;
 	uint16_t	reserved2;
 } ubx_payload_rx_nav_svinfo_part1_t;
 
 /* Rx NAV-SVINFO Part 2 (repeated) */
 typedef struct {
-	uint8_t		chn; 		/**< Channel number, 255 for SVs not assigned to a channel */
-	uint8_t		svid; 		/**< Satellite ID */
+	uint8_t		chn;		/**< Channel number, 255 for SVs not assigned to a channel */
+	uint8_t		svid;		/**< Satellite ID */
 	uint8_t		flags;
 	uint8_t		quality;
 	uint8_t		cno;		/**< Carrier to Noise Ratio (Signal Strength) [dbHz] */
-	int8_t		elev; 		/**< Elevation [deg] */
-	int16_t		azim; 		/**< Azimuth [deg] */
-	int32_t		prRes; 		/**< Pseudo range residual [cm] */
+	int8_t		elev;		/**< Elevation [deg] */
+	int16_t		azim;		/**< Azimuth [deg] */
+	int32_t		prRes;		/**< Pseudo range residual [cm] */
 } ubx_payload_rx_nav_svinfo_part2_t;
 
 /* Rx NAV-SVIN (survey-in info) */
@@ -568,7 +568,7 @@ class GPSDriverUBX : public GPSHelper
 {
 public:
 	GPSDriverUBX(GPSCallbackPtr callback, void *callback_user, struct vehicle_gps_position_s *gps_position,
-		     struct satellite_info_s *satellite_info);
+			 struct satellite_info_s *satellite_info);
 	virtual ~GPSDriverUBX();
 	int receive(unsigned timeout);
 	int configure(unsigned &baudrate, OutputMode output_mode);
@@ -641,6 +641,9 @@ private:
 	 */
 	uint32_t fnv1_32_str(uint8_t *str, uint32_t hval);
 
+	int inner_receive_task(unsigned timeout);
+	static int inner_receive_task_trampoline(unsigned timeout);
+
 	struct vehicle_gps_position_s *_gps_position;
 	struct satellite_info_s *_satellite_info;
 	uint64_t _last_timestamp_time;
@@ -663,6 +666,14 @@ private:
 	OutputMode		_output_mode = OutputMode::GPS;
 
 	rtcm_message_t	*_rtcm_message = nullptr;
+
+	uint8_t buf[GPS_READ_BUFFER_SIZE];
+
+	/* timeout additional to poll */
+	gps_abstime _time_started;
+
+	int handled;
 };
 
+extern GPSDriverUBX *ubx_instance;
 #endif /* UBX_H_ */
