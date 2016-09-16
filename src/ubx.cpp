@@ -54,6 +54,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctime>
+#include <px4_posix.h>
 
 #include "ubx.h"
 
@@ -378,9 +379,9 @@ GPSDriverUBX::waitForAck(const uint16_t msg, const unsigned timeout, const bool 
 	return ret;
 }
 
-int GPSDriverUBX::inner_receive_task_trampoline(unsigned timeout)
+int GPSDriverUBX::inner_receive_task_trampoline(unsigned *timeout)
 {
-  return ubx_instance->inner_receive_task(timeout);
+  return ubx_instance->inner_receive_task(*timeout);
 }
 
 int GPSDriverUBX::inner_receive_task(unsigned timeout)
@@ -431,7 +432,7 @@ GPSDriverUBX::receive(unsigned timeout)
 	pthread_t inner_task_thread;
 	struct sched_param sparam;
 	pthread_attr_t attr;
-	pthread_addr_t result;
+	int * result = nullptr;
 
 	pthread_attr_init(&attr);
 	pthread_attr_setstacksize(&attr, 1000);
@@ -441,13 +442,13 @@ GPSDriverUBX::receive(unsigned timeout)
 
 	while (true) {
 
-	  pthread_create(&inner_task_thread, &attr, (pthread_startroutine_t) &ubx_instance->inner_receive_task_trampoline, (FAR void *)timeout);
-	  pthread_join(inner_task_thread, &result);
+	  pthread_create(&inner_task_thread, &attr, (pthread_startroutine_t)&ubx_instance->inner_receive_task_trampoline, (void *) &timeout);
+	  pthread_join(inner_task_thread, (void **)result);
 
-	  if ((int)result == 3) {
+	  if (*result == 3) {
 	    continue;
 	  } else {
-	    return (int)result;
+	    return *result;
 	  }
 	}
 }

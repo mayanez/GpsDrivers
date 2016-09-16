@@ -642,7 +642,7 @@ private:
 	uint32_t fnv1_32_str(uint8_t *str, uint32_t hval);
 
 	int inner_receive_task(unsigned timeout);
-	static int inner_receive_task_trampoline(unsigned timeout);
+	static int inner_receive_task_trampoline(unsigned *timeout);
 
 	struct vehicle_gps_position_s *_gps_position;
 	struct satellite_info_s *_satellite_info;
